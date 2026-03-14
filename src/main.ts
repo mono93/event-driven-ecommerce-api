@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const port = process.env.PORT || 8080
+  const port = process.env.PORT || 8080;
   const app = await NestFactory.create(AppModule);
 
   Logger.log('Environment: Dev', 'Bootstarp');
