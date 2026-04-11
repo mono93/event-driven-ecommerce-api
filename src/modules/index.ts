@@ -1,3 +1,2 @@
-export { AuthModule } from "./auth/auth.module";
-export { PaymentModule } from "./payment/payment.module";
+export { OrderModule } from "./order/order.module";
 export { ProductModule } from "./product/product.module";

@@ -3,7 +3,7 @@ import { AppController } from "./app.controller";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import * as Joi from "joi";
-import { AuthModule, PaymentModule, ProductModule } from "./modules";
+import { OrderModule, ProductModule } from "./modules";
 import { AppRoutingModule } from "./routes/routes";
 import { ResponseModule } from "./services/response/response.module";
 
@@ -26,11 +26,15 @@ import { ResponseModule } from "./services/response/response.module";
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>("MONGODB_URI"),
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        retryWrites: true,
+        maxPoolSize: 10,
+        bufferTimeoutMS: 20000
       }),
     }),
     ProductModule,
-    PaymentModule,
-    AuthModule,
+    OrderModule,
     AppRoutingModule,
     ResponseModule,
   ],
