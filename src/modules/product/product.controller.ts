@@ -52,8 +52,7 @@ export class ProductController {
   @Get(":id")
   @ApiSingleResponse(ProductResponse, "Get product details by ID")
   async getProductById(@Param("id") id: string, @Res() res: Response) {
-
-    if (!id ) {
+    if (!id) {
       throw new BadRequestException("product id not available");
     }
 

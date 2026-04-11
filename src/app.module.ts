@@ -30,7 +30,7 @@ import { ResponseModule } from "./services/response/response.module";
         socketTimeoutMS: 45000,
         retryWrites: true,
         maxPoolSize: 10,
-        bufferTimeoutMS: 20000
+        bufferTimeoutMS: 20000,
       }),
     }),
     ProductModule,

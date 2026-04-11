@@ -78,7 +78,7 @@ const orderSchema = new mongoose.Schema(
         delete ret._id;
       },
     },
-  }
+  },
 );
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
