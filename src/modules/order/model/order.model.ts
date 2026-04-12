@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface OrderItem {
+export interface OrderItem {
   productId: mongoose.Types.ObjectId;
   name: string;
   price: number;
@@ -88,3 +88,5 @@ orderSchema.statics.build = (attrs: OrderAttrs) => {
 const Order = mongoose.model<OrderDoc, OrderModel>("order", orderSchema);
 
 export { Order };
+export { orderSchema };
+export type { OrderDoc, OrderModel };

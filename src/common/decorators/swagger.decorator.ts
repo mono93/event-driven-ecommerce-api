@@ -30,3 +30,17 @@ export function ApiSingleResponse<TModel extends Type<any>>(
     }),
   );
 }
+
+export function ApiCreatedResponse<TModel extends Type<any>>(
+  model: TModel,
+  operationSummary: string,
+) {
+  return applyDecorators(
+    ApiOperation({ summary: operationSummary }),
+    ApiResponse({
+      status: 201,
+      description: `${model.name} created successfully`,
+      type: model,
+    }),
+  );
+}
