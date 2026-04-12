@@ -6,8 +6,8 @@ import * as Joi from "joi";
 import { OrderModule, ProductModule } from "./modules";
 import { AppRoutingModule } from "./routes/routes";
 import { ResponseModule } from "./services/response/response.module";
-import { UserModule } from './modules/user/user.module';
-import { PaymentModule } from './modules/payment/payment.module';
+import { UserModule } from "./modules/user/user.module";
+import { PaymentModule } from "./modules/payment/payment.module";
 
 @Module({
   imports: [
@@ -32,7 +32,7 @@ import { PaymentModule } from './modules/payment/payment.module';
         socketTimeoutMS: 45000,
         retryWrites: true,
         maxPoolSize: 10,
-        bufferTimeoutMS: 30000
+        bufferTimeoutMS: 30000,
       }),
     }),
     ProductModule,

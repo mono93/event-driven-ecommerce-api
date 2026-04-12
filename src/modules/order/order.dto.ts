@@ -41,6 +41,6 @@ export class CreateOrderDTO {
   @ApiProperty({ type: [OrderItemDTO] })
   @IsArray()
   @ValidateNested({ each: true }) // Validates each object in the array
-  @Type(() => OrderItemDTO)       // Tells class-transformer how to hydrate the objects
+  @Type(() => OrderItemDTO) // Tells class-transformer how to hydrate the objects
   items: OrderItemDTO[];
 }

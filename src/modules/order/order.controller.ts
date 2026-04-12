@@ -13,7 +13,10 @@ import { OrderService } from "./order.service";
 import { ResponseService } from "../../services/response/response.service";
 import { CreateOrderDTO } from "./order.dto";
 import type { Response } from "express";
-import { ApiCreatedResponse, ApiPaginatedResponse } from "../../common/decorators/swagger.decorator";
+import {
+  ApiCreatedResponse,
+  ApiPaginatedResponse,
+} from "../../common/decorators/swagger.decorator";
 import { PaginatedOrderResponse } from "./model/orderResponse.model";
 
 @ApiTags("Order")

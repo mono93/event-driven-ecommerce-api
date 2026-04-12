@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema(
         delete ret._id;
       },
     },
-  }
+  },
 );
 
 userSchema.statics.build = (attrs: UserAttrs) => {
