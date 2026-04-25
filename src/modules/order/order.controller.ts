@@ -3,6 +3,7 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  HttpStatus,
   ParseIntPipe,
   Post,
   Query,
@@ -31,7 +32,7 @@ export class OrderController {
   @ApiCreatedResponse(CreateOrderDTO, "Order created successfully")
   async createOrder(@Body() orderDto: CreateOrderDTO, @Res() res: Response) {
     await this.orderService.createOrder(orderDto);
-    return this.responseService.success(res, 201, "Order created successfully");
+    return this.responseService.success(res, HttpStatus.CREATED, "Order created successfully");
   }
 
   @Get()
@@ -42,6 +43,11 @@ export class OrderController {
     @Res() res: Response,
   ) {
     const orders = await this.orderService.getOrders(page, limit);
-    return this.responseService.success(res, 200, "Orders retrieved successfully", orders);
+    return this.responseService.success(
+      res,
+      HttpStatus.OK,
+      "Orders retrieved successfully",
+      orders,
+    );
   }
 }

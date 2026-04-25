@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { RouterModule } from "@nestjs/core";
-import { OrderModule, ProductModule } from "../modules";
+import { OrderModule, PaymentModule, ProductModule } from "../modules";
 
 const routes = [
   {
@@ -10,6 +10,10 @@ const routes = [
   {
     path: "/product",
     module: ProductModule,
+  },
+  {
+    path: "/payment",
+    module: PaymentModule,
   },
 ];
 
