@@ -43,22 +43,15 @@ export class OrderService {
 
       const stripePriceIds = items.map((item) => item.stripePriceId);
 
-      const productDetails =
-        await this.productService.getProductsByStripePriceIds(
-          stripePriceIds,
-        );
+      const productDetails = await this.productService.getProductsByStripePriceIds(stripePriceIds);
 
       this.logger.log(`Fetched product details`, productDetails); // Log the number of products fetched
 
       const transformedItems: OrderItem[] = items.map((item) => {
-        const product = productDetails.find(
-          (p) => p.stripePriceId === item.stripePriceId,
-        );
+        const product = productDetails.find((p) => p.stripePriceId === item.stripePriceId);
 
         if (!product) {
-          throw new NotFoundException(
-            `Product not found for stripePriceId: ${item.stripePriceId}`,
-          );
+          throw new NotFoundException(`Product not found for stripePriceId: ${item.stripePriceId}`);
         }
 
         return {
@@ -70,10 +63,7 @@ export class OrderService {
         };
       });
 
-      const totalOrderPrice = transformedItems.reduce(
-        (sum, item) => sum + item.subtotal,
-        0,
-      );
+      const totalOrderPrice = transformedItems.reduce((sum, item) => sum + item.subtotal, 0);
 
       const payload: OrderAttrs = {
         userId: new Types.ObjectId(userId),
@@ -87,18 +77,13 @@ export class OrderService {
 
       return order;
     } catch (error) {
-      if (
-        error instanceof BadRequestException ||
-        error instanceof NotFoundException
-      ) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
         throw error;
       }
 
       this.logger.error("Failed to create order", error);
 
-      throw new InternalServerErrorException(
-        "Failed to create order",
-      );
+      throw new InternalServerErrorException("Failed to create order");
     }
   }
 
@@ -121,9 +106,7 @@ export class OrderService {
     } catch (error) {
       this.logger.error("Failed to fetch orders", error);
 
-      throw new InternalServerErrorException(
-        "Failed to fetch orders",
-      );
+      throw new InternalServerErrorException("Failed to fetch orders");
     }
   }
 }
