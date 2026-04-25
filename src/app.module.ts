@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
@@ -24,16 +24,37 @@ import { PaymentModule } from "./modules/payment/payment.module";
       },
     }),
     MongooseModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>("MONGODB_URI"),
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000,
-        retryWrites: true,
-        maxPoolSize: 10,
-        bufferTimeoutMS: 30000,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const logger = new Logger("MongoDB");
+
+        return {
+          uri: configService.get<string>("MONGODB_URI"),
+
+          serverSelectionTimeoutMS: 5000,
+          socketTimeoutMS: 45000,
+          retryWrites: true,
+          maxPoolSize: 10,
+
+          bufferCommands: false,
+
+          connectionFactory: (connection) => {
+            connection.on("connected", () => {
+              logger.log("MongoDB connected");
+            });
+
+            connection.on("error", (error) => {
+              logger.error("MongoDB connection error", error);
+            });
+
+            connection.on("disconnected", () => {
+              logger.warn("MongoDB disconnected");
+            });
+
+            return connection;
+          },
+        };
+      },
     }),
     ProductModule,
     OrderModule,

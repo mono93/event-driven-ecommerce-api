@@ -4,27 +4,14 @@ import { Type } from "class-transformer";
 
 // 1. Create a DTO for the individual items in the array
 class OrderItemDTO {
-  @ApiProperty({ example: "60f7..." })
+  @ApiProperty({ example: "price..." })
   @IsString()
-  productId: string;
-
-  @ApiProperty({ example: "Laptop" })
-  @IsString()
-  name: string;
-
-  @ApiProperty({ example: 1000 })
-  @IsNumber()
-  @Min(0)
-  price: number;
+  stripePriceId: string;
 
   @ApiProperty({ example: 1 })
   @IsNumber()
   @Min(1)
   count: number;
-
-  @ApiProperty({ example: 1000 })
-  @IsNumber()
-  subtotal: number;
 }
 
 // 2. Main Order DTO
@@ -32,11 +19,6 @@ export class CreateOrderDTO {
   @ApiProperty({ example: "60f7...user_id" })
   @IsString()
   userId: string;
-
-  @ApiProperty({ example: 1050 })
-  @IsNumber()
-  @Min(0)
-  totalOrderPrice: number;
 
   @ApiProperty({ type: [OrderItemDTO] })
   @IsArray()

@@ -12,6 +12,12 @@ export class ProductResponse {
 
   @ApiProperty({ example: 99.99 })
   price: number;
+
+  @ApiProperty({ example: "stripe_product_id" })
+  stripeProductId: string;
+
+  @ApiProperty({ example: "stripe_price_id" })
+  stripePriceId: string;
 }
 
 export class PaginatedProductResponse {

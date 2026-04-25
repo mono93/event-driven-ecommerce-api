@@ -5,85 +5,125 @@ import {
   Logger,
   NotFoundException,
 } from "@nestjs/common";
-import { CreateOrderDTO } from "./order.dto";
-import mongoose from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { OrderDoc, OrderItem } from "./model/order.model";
-import type { OrderModel } from "./model/order.model";
-import type { UserModel } from "../user/model/user.model";
+import { Model, Types } from "mongoose";
+
+import { CreateOrderDTO } from "./order.dto";
+import { OrderAttrs, OrderDoc, OrderItem } from "./model/order.model";
+import { ProductService } from "../product/product.service";
+import { UserDoc } from "../user/model/user.model";
 
 @Injectable()
 export class OrderService {
   private readonly logger = new Logger(OrderService.name);
 
   constructor(
-    @InjectModel("user") private readonly userModel: UserModel,
-    @InjectModel("order") private readonly orderModel: OrderModel,
+    @InjectModel("Order")
+    private readonly orderModel: Model<OrderDoc>,
+
+    @InjectModel("User")
+    private readonly userModel: Model<UserDoc>,
+
+    private readonly productService: ProductService,
   ) {}
 
   async createOrder(orderDto: CreateOrderDTO): Promise<OrderDoc> {
     try {
-      const { userId, ...rest } = orderDto;
+      const { userId, items } = orderDto;
 
-      if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      if (!Types.ObjectId.isValid(userId)) {
         throw new BadRequestException("Invalid userId");
       }
 
       const user = await this.userModel.findById(userId).exec();
 
-      this.logger.debug("User found:", user);
-
       if (!user) {
         throw new NotFoundException("User not found");
       }
 
-      const transformedItems: OrderItem[] = rest.items.map((item) => ({
-        ...item,
-        productId: new mongoose.Types.ObjectId(item.productId),
-      }));
+      const stripePriceIds = items.map((item) => item.stripePriceId);
 
-      const order = this.orderModel.build({
-        userId: new mongoose.Types.ObjectId(userId),
-        totalOrderPrice: rest.totalOrderPrice,
-        items: transformedItems,
+      const productDetails =
+        await this.productService.getProductsByStripePriceIds(
+          stripePriceIds,
+        );
+
+      this.logger.log(`Fetched product details`, productDetails); // Log the number of products fetched
+
+      const transformedItems: OrderItem[] = items.map((item) => {
+        const product = productDetails.find(
+          (p) => p.stripePriceId === item.stripePriceId,
+        );
+
+        if (!product) {
+          throw new NotFoundException(
+            `Product not found for stripePriceId: ${item.stripePriceId}`,
+          );
+        }
+
+        return {
+          productId: new Types.ObjectId(product.id),
+          name: product.name,
+          price: product.price,
+          count: item.count,
+          subtotal: product.price * item.count,
+        };
       });
 
-      await order.save();
+      const totalOrderPrice = transformedItems.reduce(
+        (sum, item) => sum + item.subtotal,
+        0,
+      );
 
-      this.logger.debug("Order Created:", order);
+      const payload: OrderAttrs = {
+        userId: new Types.ObjectId(userId),
+        totalOrderPrice,
+        items: transformedItems,
+      };
+
+      const order = await this.orderModel.create(payload);
+
+      this.logger.log(`Order created: ${order.id}`);
+
       return order;
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
         throw error;
       }
-      this.logger.error(`Error saving order`, error);
+
+      this.logger.error("Failed to create order", error);
+
       throw new InternalServerErrorException(
-        "Failed to create order. Please check the database connection.",
+        "Failed to create order",
       );
     }
   }
 
-  async getOrders(page: number, limit: number) {
-    const skip = (page - 1) * limit;
+  async getOrders(page = 1, limit = 10) {
     try {
+      const skip = (page - 1) * limit;
+
       const [orders, total] = await Promise.all([
         this.orderModel.find().skip(skip).limit(limit).exec(),
         this.orderModel.countDocuments().exec(),
       ]);
-
-      const totalPages = Math.ceil(total / limit);
 
       return {
         orders,
         total,
         page,
         limit,
-        totalPages,
-        currentPage: page,
+        totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
-      this.logger.error(`Error fetching orders: ${error}`);
-      throw new InternalServerErrorException("Failed to fetch orders. Please try again later.");
+      this.logger.error("Failed to fetch orders", error);
+
+      throw new InternalServerErrorException(
+        "Failed to fetch orders",
+      );
     }
   }
 }

@@ -1,44 +1,61 @@
 import mongoose from "mongoose";
 
-export interface UserAttrs {
-  firstName: string;
-  lastName: string;
-  email: string;
+export interface ProductAttrs {
+  name: string;
+  description: string;
+  price: number;
+  stripeProductId: string;
+  stripePriceId: string;
 }
 
-export interface UserDoc extends mongoose.Document {
-  firstName: string;
-  lastName: string;
-  email: string;
+export interface ProductDoc extends mongoose.Document {
+  name: string;
+  description: string;
+  price: number;
+  stripeProductId: string;
+  stripePriceId: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export const userSchema = new mongoose.Schema(
+export const productSchema = new mongoose.Schema(
   {
-    firstName: {
+    name: {
       type: String,
       required: true,
       trim: true,
     },
 
-    lastName: {
+    description: {
       type: String,
       required: true,
       trim: true,
     },
 
-    email: {
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    stripeProductId: {
       type: String,
       required: true,
       unique: true,
       index: true,
-      lowercase: true,
+      trim: true,
+    },
+
+    stripePriceId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
       trim: true,
     },
   },
   {
-    collection: "users",
+    collection: "products",
     timestamps: true,
 
     toJSON: {

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+export type OrderStatus = "pending" | "success" | "failed";
+
 export interface OrderItem {
   productId: mongoose.Types.ObjectId;
   name: string;
@@ -8,27 +10,27 @@ export interface OrderItem {
   subtotal: number;
 }
 
-interface OrderAttrs {
+export interface OrderAttrs {
   userId: mongoose.Types.ObjectId;
   totalOrderPrice: number;
   items: OrderItem[];
+  status?: OrderStatus;
 }
 
-interface OrderDoc extends mongoose.Document {
+export interface OrderDoc extends mongoose.Document {
   userId: mongoose.Types.ObjectId;
   totalOrderPrice: number;
   items: OrderItem[];
+  status: OrderStatus;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-interface OrderModel extends mongoose.Model<OrderDoc> {
-  build(attrs: OrderAttrs): OrderDoc;
-}
-
-const orderSchema = new mongoose.Schema(
+export const orderSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
       required: true,
     },
 
@@ -38,22 +40,31 @@ const orderSchema = new mongoose.Schema(
       min: 0,
     },
 
+    status: {
+      type: String,
+      enum: ["pending", "success", "failed"],
+      default: "pending",
+      required: true,
+    },
+
     items: [
       {
         productId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "product",
+          ref: "Product",
           required: true,
         },
 
         name: {
           type: String,
           required: true,
+          trim: true,
         },
 
         price: {
           type: Number,
           required: true,
+          min: 0,
         },
 
         count: {
@@ -65,14 +76,17 @@ const orderSchema = new mongoose.Schema(
         subtotal: {
           type: Number,
           required: true,
+          min: 0,
         },
       },
     ],
   },
   {
-    collection: "order",
+    collection: "orders",
     timestamps: true,
+
     toJSON: {
+      versionKey: false,
       transform(doc, ret: any) {
         ret.id = ret._id;
         delete ret._id;
@@ -80,13 +94,3 @@ const orderSchema = new mongoose.Schema(
     },
   },
 );
-
-orderSchema.statics.build = (attrs: OrderAttrs) => {
-  return new Order(attrs);
-};
-
-const Order = mongoose.model<OrderDoc, OrderModel>("order", orderSchema);
-
-export { Order };
-export { orderSchema };
-export type { OrderDoc, OrderModel };

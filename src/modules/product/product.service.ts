@@ -7,12 +7,16 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { ProductResponse } from "./models/productResponse.model";
+import { ProductDoc } from "./models/product.model";
 
 @Injectable()
 export class ProductService {
   private readonly logger = new Logger(ProductService.name);
 
-  constructor(@InjectModel("product") private readonly productModel: Model<any>) {}
+  constructor(
+    @InjectModel("Product")
+    private readonly productModel: Model<ProductDoc>,
+  ) {}
 
   async getProducts(
     page: number,
@@ -70,6 +74,31 @@ export class ProductService {
       this.logger.error(`Error fetching product by ID: ${id}`, error);
       throw new InternalServerErrorException(
         "Failed to retrieve product. Please check the ID format.",
+      );
+    }
+  }
+
+  async getProductsByStripePriceIds(stripePriceIds: string[]) {
+    try {
+      const res = await this.productModel.find({ stripePriceId: { $in: stripePriceIds } }).exec();
+
+      if (!res || res.length === 0) {
+        this.logger.warn(`Products not found with Stripe price IDs: ${stripePriceIds.join(", ")}`);
+        throw new NotFoundException(`Products with provided Stripe IDs not found`);
+      }
+
+      this.logger.log(`Fetched products by Stripe Price IDs: ${stripePriceIds.join(", ")}`);
+      return res;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(
+        `Error fetching products by Stripe IDs: ${stripePriceIds.join(", ")}`,
+        error,
+      );
+      throw new InternalServerErrorException(
+        "Failed to retrieve products. Please check the Stripe IDs format.",
       );
     }
   }
