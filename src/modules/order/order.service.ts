@@ -87,13 +87,13 @@ export class OrderService {
     }
   }
 
-  async getOrders(page = 1, limit = 10) {
+  async getOrders(userId, page = 1, limit = 10) {
     try {
       const skip = (page - 1) * limit;
 
       const [orders, total] = await Promise.all([
-        this.orderModel.find().skip(skip).limit(limit).exec(),
-        this.orderModel.countDocuments().exec(),
+        this.orderModel.find({ userId }).skip(skip).limit(limit).exec(),
+        this.orderModel.countDocuments({ userId }).exec(),
       ]);
 
       return {

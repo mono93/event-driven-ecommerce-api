@@ -37,14 +37,15 @@ export class OrderController {
     });
   }
 
-  @Get()
+  @Get("list")
   @ApiPaginatedResponse(PaginatedOrderResponse, "Get a paginated list of products")
   async getOrders(
+    @Query("userId") userId: string,
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Res() res: Response,
   ) {
-    const orders = await this.orderService.getOrders(page, limit);
+    const orders = await this.orderService.getOrders(userId, page, limit);
     return this.responseService.success(
       res,
       HttpStatus.OK,

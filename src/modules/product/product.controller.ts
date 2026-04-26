@@ -24,7 +24,7 @@ export class ProductController {
     private readonly responseService: ResponseService,
   ) {}
 
-  @Get()
+  @Get("list")
   @ApiPaginatedResponse(PaginatedProductResponse, "Get a paginated list of products")
   async getProducts(
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
