@@ -14,34 +14,27 @@ export type PaymentStatus =
 export interface PaymentAttrs {
   orderId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-
-  amount: number; // store in paise/cents
-  currency: string;
-
+  amount?: number;
+  currency?: string;
   provider?: PaymentProvider;
-
   stripeCheckoutSessionId?: string;
   stripePaymentIntentId?: string;
   stripeChargeId?: string;
-
   status?: PaymentStatus;
+  failedReason?: string;
 }
 
 export interface PaymentDoc extends mongoose.Document {
   orderId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-
   amount: number;
   currency: string;
-
   provider: PaymentProvider;
-
   stripeCheckoutSessionId?: string;
   stripePaymentIntentId?: string;
   stripeChargeId?: string;
-
   status: PaymentStatus;
-
+  failedReason?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -64,13 +57,13 @@ export const paymentSchema = new mongoose.Schema(
 
     amount: {
       type: Number,
-      required: true,
+      required: false,
       min: 0,
     },
 
     currency: {
       type: String,
-      required: true,
+      required: false,
       default: "inr",
       lowercase: true,
       trim: true,
@@ -121,6 +114,11 @@ export const paymentSchema = new mongoose.Schema(
       default: "pending",
       required: true,
       index: true,
+    },
+
+    failedReason: {
+      type: String,
+      trim: true,
     },
   },
   {

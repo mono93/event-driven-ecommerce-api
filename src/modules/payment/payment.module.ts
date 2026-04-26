@@ -5,6 +5,7 @@ import { ResponseModule } from "../../services/response/response.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { paymentSchema } from "./model/payment.model";
 import { userSchema } from "../user/model/user.model";
+import { orderSchema } from "../order/model/order.model";
 
 @Module({
   imports: [
@@ -18,6 +19,10 @@ import { userSchema } from "../user/model/user.model";
       {
         name: "User",
         schema: userSchema,
+      },
+      {
+        name: "Order",
+        schema: orderSchema,
       },
     ]),
   ],

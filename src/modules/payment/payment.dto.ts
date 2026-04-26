@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsString, IsUrl, ValidateNested, Min, IsInt } from "class-validator";
+import { IsArray, IsString, IsUrl, ValidateNested, Min, IsInt, IsNotEmpty } from "class-validator";
 import { Type } from "class-transformer";
 
 class PaymentItemDTO {
@@ -26,6 +26,12 @@ export class CreatePaymentDTO {
   userId: string;
 
   @ApiProperty({
+    example: "662f0d4c9e1a23b456789abc",
+  })
+  @IsString()
+  orderId: string;
+
+  @ApiProperty({
     type: [PaymentItemDTO],
   })
   @IsArray()
@@ -46,4 +52,14 @@ export class CreatePaymentDTO {
   @IsString()
   @IsUrl()
   cancelUrl: string;
+}
+
+export class CancelPaymentDto {
+  @ApiProperty({
+    example: "cs_test_a1b2c3d4",
+    description: "Stripe checkout session id",
+  })
+  @IsString()
+  @IsNotEmpty()
+  sessionId: string;
 }

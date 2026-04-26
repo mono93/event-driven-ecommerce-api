@@ -1,3 +1,4 @@
+import { count } from "console";
 import mongoose from "mongoose";
 
 export interface AddressAttrs {
@@ -6,6 +7,7 @@ export interface AddressAttrs {
   city: string;
   postalCode: number;
   state: string;
+  country: string;
 }
 
 export interface UserAttrs {
@@ -13,6 +15,7 @@ export interface UserAttrs {
   lastName: string;
   email: string;
   address: AddressAttrs;
+  stripeCustomerId?: string;
 }
 
 export interface UserDoc extends mongoose.Document {
@@ -22,6 +25,7 @@ export interface UserDoc extends mongoose.Document {
   address: AddressAttrs;
   createdAt: Date;
   updatedAt: Date;
+  stripeCustomerId?: string;
 }
 
 export const userSchema = new mongoose.Schema(
@@ -45,6 +49,13 @@ export const userSchema = new mongoose.Schema(
       index: true,
       lowercase: true,
       trim: true,
+    },
+
+    stripeCustomerId: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
     },
 
     address: {
@@ -74,6 +85,12 @@ export const userSchema = new mongoose.Schema(
       },
 
       state: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      country: {
         type: String,
         required: true,
         trim: true,

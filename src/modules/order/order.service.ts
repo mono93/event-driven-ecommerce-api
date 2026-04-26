@@ -45,7 +45,7 @@ export class OrderService {
 
       const productDetails = await this.productService.getProductsByStripePriceIds(stripePriceIds);
 
-      this.logger.log(`Fetched product details`, productDetails); // Log the number of products fetched
+      this.logger.log(`Fetched product details`, productDetails);
 
       const transformedItems: OrderItem[] = items.map((item) => {
         const product = productDetails.find((p) => p.stripePriceId === item.stripePriceId);
