@@ -18,6 +18,7 @@ export interface OrderAttrs {
 }
 
 export interface OrderDoc extends mongoose.Document {
+  id: string;
   userId: mongoose.Types.ObjectId;
   totalOrderPrice: number;
   items: OrderItem[];

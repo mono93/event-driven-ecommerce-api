@@ -5,12 +5,12 @@ import { Type } from "class-transformer";
 class OrderItemDTO {
   @ApiProperty({ example: "price..." })
   @IsString()
-  stripePriceId: string;
+  priceId: string;
 
   @ApiProperty({ example: 1 })
   @IsNumber()
   @Min(1)
-  count: number;
+  quantity: number;
 }
 
 export class CreateOrderDTO {

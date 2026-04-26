@@ -31,8 +31,10 @@ export class OrderController {
   @Post()
   @ApiCreatedResponse(CreateOrderDTO, "Order created successfully")
   async createOrder(@Body() orderDto: CreateOrderDTO, @Res() res: Response) {
-    await this.orderService.createOrder(orderDto);
-    return this.responseService.success(res, HttpStatus.CREATED, "Order created successfully");
+    const order = await this.orderService.createOrder(orderDto);
+    return this.responseService.success(res, HttpStatus.CREATED, "Order created successfully", {
+      orderId: order.id,
+    });
   }
 
   @Get()

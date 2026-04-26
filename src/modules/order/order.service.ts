@@ -41,25 +41,25 @@ export class OrderService {
         throw new NotFoundException("User not found");
       }
 
-      const stripePriceIds = items.map((item) => item.stripePriceId);
+      const stripePriceIds = items.map((item) => item.priceId);
 
       const productDetails = await this.productService.getProductsByStripePriceIds(stripePriceIds);
 
       this.logger.log(`Fetched product details`, productDetails);
 
       const transformedItems: OrderItem[] = items.map((item) => {
-        const product = productDetails.find((p) => p.stripePriceId === item.stripePriceId);
+        const product = productDetails.find((p) => p.stripePriceId === item.priceId);
 
         if (!product) {
-          throw new NotFoundException(`Product not found for stripePriceId: ${item.stripePriceId}`);
+          throw new NotFoundException(`Product not found for stripePriceId: ${item.priceId}`);
         }
 
         return {
           productId: new Types.ObjectId(product.id),
           name: product.name,
           price: product.price,
-          count: item.count,
-          subtotal: product.price * item.count,
+          count: item.quantity,
+          subtotal: product.price * item.quantity,
         };
       });
 
