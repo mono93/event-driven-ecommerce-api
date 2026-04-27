@@ -14,10 +14,10 @@ export class PaymentController {
   ) {}
 
   @Post("create-checkout-session")
-  @HttpCode(303)
+  @HttpCode(302)
   @ApiOperation({ summary: "Create a Stripe checkout session" })
   @ApiResponse({
-    status: 303,
+    status: 302,
     description: "Checkout session created successfully",
   })
   async createCheckoutSession(@Body() paymentDto: CreatePaymentDTO, @Res() res: Response) {

@@ -18,7 +18,7 @@ import {
   ApiCreatedResponse,
   ApiPaginatedResponse,
 } from "../../common/decorators/swagger.decorator";
-import { PaginatedOrderResponse } from "./model/orderResponse.model";
+import { CreateOrderResponse, PaginatedOrderResponse } from "./model/orderResponse.model";
 
 @ApiTags("Order")
 @Controller("")
@@ -29,7 +29,7 @@ export class OrderController {
   ) {}
 
   @Post()
-  @ApiCreatedResponse(CreateOrderDTO, "Order created successfully")
+  @ApiCreatedResponse(CreateOrderResponse, "Order created successfully")
   async createOrder(@Body() orderDto: CreateOrderDTO, @Res() res: Response) {
     const order = await this.orderService.createOrder(orderDto);
     return this.responseService.success(res, HttpStatus.CREATED, "Order created successfully", {

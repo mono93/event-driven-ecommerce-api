@@ -57,13 +57,12 @@ export const paymentSchema = new mongoose.Schema(
 
     amount: {
       type: Number,
-      required: false,
+      default: 0,
       min: 0,
     },
 
     currency: {
       type: String,
-      required: false,
       default: "inr",
       lowercase: true,
       trim: true,
@@ -78,25 +77,16 @@ export const paymentSchema = new mongoose.Schema(
 
     stripeCheckoutSessionId: {
       type: String,
-      unique: true,
-      sparse: true,
-      index: true,
       trim: true,
     },
 
     stripePaymentIntentId: {
       type: String,
-      unique: true,
-      sparse: true,
-      index: true,
       trim: true,
     },
 
     stripeChargeId: {
       type: String,
-      unique: true,
-      sparse: true,
-      index: true,
       trim: true,
     },
 
@@ -127,7 +117,7 @@ export const paymentSchema = new mongoose.Schema(
 
     toJSON: {
       versionKey: false,
-      transform(doc, ret: any) {
+      transform(_doc, ret: any) {
         ret.id = ret._id;
         delete ret._id;
       },
@@ -135,10 +125,45 @@ export const paymentSchema = new mongoose.Schema(
 
     toObject: {
       versionKey: false,
-      transform(doc, ret: any) {
+      transform(_doc, ret: any) {
         ret.id = ret._id;
         delete ret._id;
       },
+    },
+  },
+);
+
+/**
+ * SAFE UNIQUE INDEXES
+ * Only enforce uniqueness when actual value exists
+ */
+
+paymentSchema.index(
+  { stripeCheckoutSessionId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      stripeCheckoutSessionId: { $exists: true, $ne: null },
+    },
+  },
+);
+
+paymentSchema.index(
+  { stripePaymentIntentId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      stripePaymentIntentId: { $exists: true, $ne: null },
+    },
+  },
+);
+
+paymentSchema.index(
+  { stripeChargeId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      stripeChargeId: { $exists: true, $ne: null },
     },
   },
 );

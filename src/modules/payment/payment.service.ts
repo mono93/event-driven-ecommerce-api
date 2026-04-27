@@ -44,8 +44,8 @@ export class PaymentService {
         quantity: item.quantity,
       })),
       mode: "payment",
-      success_url: successUrl,
-      cancel_url: `${cancelUrl}?session_id=` + "{CHECKOUT_SESSION_ID}",
+      success_url: `${successUrl}&session_id=` + "{CHECKOUT_SESSION_ID}",
+      cancel_url: `${cancelUrl}&session_id=` + "{CHECKOUT_SESSION_ID}",
     });
 
     await this.createPaymentRecord(session.id, userId, orderId);
@@ -112,11 +112,13 @@ export class PaymentService {
 
     const payment = await this.paymentModel.findOne({ stripeCheckoutSessionId: sessionId }).exec();
 
+    this.logger.log(`Fetched payment for cancellation`, payment);
+
     if (payment?.status === "processing") {
       await this.updatePaymentStatusBySessionId(
         sessionId,
-        null,
-        null,
+        undefined,
+        undefined,
         0,
         "canceled",
         "Payment canceled by user",
@@ -180,8 +182,8 @@ export class PaymentService {
 
   private async updatePaymentStatusBySessionId(
     sessionId: string,
-    stripePaymentIntentId: string | null,
-    stripeChargeId: string | null,
+    stripePaymentIntentId: string | undefined,
+    stripeChargeId: string | undefined,
     amount: number,
     status: string,
     failedReason?: string,

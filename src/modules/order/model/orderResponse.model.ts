@@ -56,3 +56,8 @@ export class PaginatedOrderResponse {
   @ApiProperty({ example: 1 })
   currentPage: number;
 }
+
+export class CreateOrderResponse {
+  @ApiProperty({ example: "69da..." })
+  orderId: string;
+}
