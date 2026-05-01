@@ -18,6 +18,7 @@ import { PaymentModule } from "./modules/payment/payment.module";
         MONGODB_URI: Joi.string().required(),
         PORT: Joi.number().default(8080),
         STRIPE_SECRET_KEY: Joi.string().required(),
+        STRIPE_WEBHOOK_SECRET: Joi.string().required(),
       }),
       validationOptions: {
         allowUnknown: true,
