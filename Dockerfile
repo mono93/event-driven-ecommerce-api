@@ -1,32 +1,26 @@
-# ---------------- BUILD STAGE ----------------
-FROM node:20-slim AS builder
+# Build stage
+FROM node:20-alpine AS builder
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Build-time env for Next.js
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+COPY package.json package-lock.json* ./
+RUN npm install
 
-COPY package*.json ./
-RUN npm ci
-
+COPY tsconfig.json tsconfig.build.json ./
 COPY . .
-
 RUN npm run build
 
+# Production stage
+FROM node:20-alpine AS runner
 
-# ---------------- RUNTIME STAGE ----------------
-FROM node:20-slim
-
-WORKDIR /app
+WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 
-# Copy standalone build output
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+COPY package.json package-lock.json* ./
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+RUN npm prune --production
 
-EXPOSE 3000
-
-CMD ["node", "server.js"]
+EXPOSE 8080
+CMD ["node", "dist/main"]
